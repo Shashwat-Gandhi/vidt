@@ -49,15 +49,10 @@ def main(args):
         args.batch_size = args.batch_size // args.n_iter_to_acc
     ##
 
-    # distributed data parallel setup
-    utils.init_distributed_mode(args)
-    print("git:\n  {}\n".format(utils.get_sha()))
-    print(args)
-
-    device = torch.device(args.device)
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     # fix the seed for reproducibility
-    seed = args.seed + utils.get_rank()
+    seed = args.seed
     torch.manual_seed(seed)
     np.random.seed(seed)
     random.seed(seed)
@@ -66,48 +61,12 @@ def main(args):
     model, criterion, postprocessors = build_model(args)
     model.to(device)
 
-    # if distil_mode is specified, load a teacher model fron a url or local path
-    teacher_model = None
-    if args.distil_model is not None:
-        print("Distillation On -- Model:", args.distil_model, "Path:", args.distil_model_path)
-        teacher_model = build_distil_model(args)
-
-        if 'http' in args.distil_model_path or 'https' in args.distil_model_path:
-            # load from a url
-            torch.hub._download_url_to_file(
-                url=args.distil_model_path,
-                dst="checkpoint.pth"
-            )
-            checkpoint = torch.load("checkpoint.pth", map_location="cpu")
-            teacher_model.load_state_dict(checkpoint["model"])
-        else:
-            # load from a local path
-            teacher_dict = torch.load(args.distil_model_path)['model']
-            teacher_model.load_state_dict(teacher_dict)
-
-        teacher_model.to(device)
-        print('complete to load the teacher model from', args.distil_model_path)
-
     # parallel model setup
     model_without_ddp = model
-    if args.distributed:
-        model = torch.nn.parallel.DistributedDataParallel(model,
-                                                          device_ids=[args.gpu],
-                                                          find_unused_parameters=True)
-        model_without_ddp = model.module
-
-        if teacher_model is not None:
-            teacher_model = torch.nn.parallel.DistributedDataParallel(teacher_model,
-                                                                      device_ids=[args.gpu],
-                                                                      find_unused_parameters=True)
 
     # print parameter info.
     n_parameters = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print('number of params:', n_parameters)
-    if teacher_model is not None:
-        n_parameters = sum(p.numel() for p in teacher_model.parameters() if p.requires_grad)
-        print('number of params for teacher:', n_parameters)
-
     # optimizer setup
     def build_optimizer(model, args):
         if hasattr(model.backbone, 'no_weight_decay'):
@@ -146,12 +105,8 @@ def main(args):
     print("# train:", len(dataset_train), ", # val", len(dataset_val))
 
     # data samplers
-    if args.distributed:
-        sampler_train = DistributedSampler(dataset_train)
-        sampler_val = DistributedSampler(dataset_val, shuffle=False)
-    else:
-        sampler_train = torch.utils.data.RandomSampler(dataset_train)
-        sampler_val = torch.utils.data.SequentialSampler(dataset_val)
+    sampler_train = torch.utils.data.RandomSampler(dataset_train)
+    sampler_val = torch.utils.data.SequentialSampler(dataset_val)
 
     batch_sampler_train = torch.utils.data.BatchSampler(
         sampler_train, args.batch_size, drop_last=True)
@@ -196,21 +151,11 @@ def main(args):
     print("Start training")
     start_time = time.time()
     for epoch in range(args.start_epoch, args.epochs):
-
-        # specify the current epoch number for samplers
-        if args.distributed:
-            sampler_train.set_epoch(epoch)
-
-        if teacher_model is None:
-            # training one epoch with distillation with token matching
-            train_stats = train_one_epoch(
-                model, criterion, data_loader_train, optimizer, device, epoch,
-                args.clip_max_norm, n_iter_to_acc=args.n_iter_to_acc, print_freq=args.print_freq)
-        else:
-            # training one epoch with default setting
-            train_stats = train_one_epoch_with_teacher(
-                model, teacher_model, criterion, data_loader_train, optimizer, device, epoch,
-                args.clip_max_norm, n_iter_to_acc=args.n_iter_to_acc, print_freq=args.print_freq)
+        
+        # training one epoch
+        train_stats = train_one_epoch(
+            model, criterion, data_loader_train, optimizer, device, epoch,
+            args.clip_max_norm, n_iter_to_acc=args.n_iter_to_acc, print_freq=args.print_freq)
         lr_scheduler.step(epoch)
 
         # model save
