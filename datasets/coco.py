@@ -85,9 +85,46 @@ class ConvertCocoPolysToMask(object):
         classes = torch.tensor(classes, dtype=torch.int64)
 
         if self.return_masks:
-            segmentations = [obj["segmentation"] for obj in anno]
+            # segmentations = [obj["segmentation"] for obj in anno]
+            # segmentations = [torch.tensor([[10,10]]) for obj in anno]
+            segmentations = [[[324.43,
+     90.3,
+     323.77,
+     92.95,
+     321.33,
+     93.39,
+     322.88,
+     95.82,
+     319.79,
+     98.25,
+     318.02,
+     167.02,
+     323.99,
+     168.35,
+     338.58,
+     167.91,
+     340.79,
+     168.57,
+     343.67,
+     101.79,
+     343.0,
+     99.36,
+     341.01,
+     96.71,
+     341.46,
+     94.94,
+     341.9,
+     94.28,
+     340.57,
+     93.17,
+     341.01,
+     89.85,
+     341.01,
+     89.63,
+     323.99,
+     90.3]] for obj in anno]
             masks = convert_coco_poly_to_mask(segmentations, h, w)
-
+        
         keypoints = None
         if anno and "keypoints" in anno[0]:
             keypoints = [obj["keypoints"] for obj in anno]
@@ -166,8 +203,8 @@ def build(image_set, args):
 
     mode = 'instances'
     PATHS = {
-        "train": (root / "train2017", root / "annotations" / f'{mode}_train2017.json'),
-        "val": (root / "val2017", root / "annotations" / f'{mode}_val2017.json'),
+        "train": (root / "train", root / 'custom_train.json'),
+        "val": (root / "test", root / 'custom_test.json'),
     }
 
     img_folder, ann_file = PATHS[image_set]
