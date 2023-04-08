@@ -5,6 +5,8 @@
 # Additionally modified by NAVER Corp. for ViDT
 # ------------------------------------------------------------------------
 
+import sys
+sys.path.append('vidt')
 import os
 import datetime
 import json
