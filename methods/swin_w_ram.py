@@ -944,23 +944,23 @@ def swin_nano(pretrained=None, **kwargs):
     model = SwinTransformer(pretrain_img_size=[224, 224], embed_dim=48, depths=[2, 2, 6, 2],
                             num_heads=[3, 6, 12, 24], window_size=7, drop_path_rate=0.0, **kwargs)
 
-    if pretrained is None or pretrained == 'none':
-        return model, 384
+    # if pretrained is None or pretrained == 'none':
+    #     return model, 384
 
-    if pretrained is not None:
-        if pretrained == 'imagenet':
-            torch.hub._download_url_to_file(
-                    url="https://github.com/naver-ai/vidt/releases/download/v0.1-swin/swin_nano_patch4_window7_224.pth",
-                dst="checkpoint.pth"
-            )
-            checkpoint = torch.load("checkpoint.pth", map_location="cpu")
-            model.load_state_dict(checkpoint["model"], strict=False)
-            print('Load the backbone pretrained on ImageNet 1K')
+    # if pretrained is not None:
+    #     if pretrained == 'imagenet':
+    #         torch.hub._download_url_to_file(
+    #                 url="https://github.com/naver-ai/vidt/releases/download/v0.1-swin/swin_nano_patch4_window7_224.pth",
+    #             dst="checkpoint.pth"
+    #         )
+    #         checkpoint = torch.load("checkpoint.pth", map_location="cpu")
+    #         model.load_state_dict(checkpoint["model"], strict=False)
+    #         print('Load the backbone pretrained on ImageNet 1K')
 
-        else:
-            checkpoint = torch.load(pretrained, map_location="cpu")
-            model.load_state_dict(checkpoint["model"], strict=False)
-            print('Load the backbone in the given path')
+    #     else:
+    #         checkpoint = torch.load(pretrained, map_location="cpu")
+    #         model.load_state_dict(checkpoint["model"], strict=False)
+    #         print('Load the backbone in the given path')
 
     return model, 384
 
