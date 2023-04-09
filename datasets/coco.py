@@ -203,8 +203,8 @@ def build(image_set, args):
 
     mode = 'instances'
     PATHS = {
-        "train": (root / "train", root / 'custom_train.json'),
-        "val": (root / "test", root / 'custom_test.json'),
+        "train": ("/kaggle/input/whole-wheat-detection/train", '/kaggle/working/plant_detector/data/json_files/custom_train.json'),
+        "val": ("/kaggle/input/whole-wheat/detection/train", '/kaggle/working/plant_detector/data/json_files/custom_test.json'),
     }
 
     img_folder, ann_file = PATHS[image_set]
