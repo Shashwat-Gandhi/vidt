@@ -6,7 +6,8 @@
 # ------------------------------------------------------------------------
 
 import sys
-sys.path.append('vidt')
+sys.path.append('vidt')     # for colab
+sys.path.append('/kaggle/working/vidt') # for kaggle
 import os
 import datetime
 import json
