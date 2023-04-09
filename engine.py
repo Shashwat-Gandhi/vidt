@@ -12,7 +12,7 @@ import sys
 from typing import Iterable
 import torch
 import util.misc as utils
-from datasets.coco_eval import CocoEvaluator
+from vidt.datasets.coco_eval import CocoEvaluator
 
 
 def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
