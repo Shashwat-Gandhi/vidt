@@ -22,7 +22,7 @@ from torch.utils.data import DataLoader, DistributedSampler
 import resource
 import vidt.datasets
 import util.misc as utils
-from vidt.datasets import build_dataset, get_coco_api_from_dataset
+from .datasets import build_dataset, get_coco_api_from_dataset
 from engine import evaluate, train_one_epoch, train_one_epoch_with_teacher
 from methods import build_model
 from util.scheduler import create_scheduler
