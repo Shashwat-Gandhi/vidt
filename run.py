@@ -176,7 +176,14 @@ def main(args):
 
         # inference
         outputs = model(samples)
-        print(outputs)
+        
+        with open('output.json', 'w') as f:
+            json.dump(outputs, f)
+        with open('input.json', 'w') as f:
+            json.dump(samples, f)
+        with open('target.json', 'w') as f:
+            json.dump(targets, f)
+        
         break
     
 #     for epoch in range(args.start_epoch, args.epochs):
