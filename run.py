@@ -169,8 +169,8 @@ def main(args):
     model.eval()
     criterion.eval()
     metric_logger = utils.MetricLogger(delimiter=", ")
-    
-    for samples, targets in metric_logger.log_every(data_loader, 256, header):
+    header = 'Test'
+    for samples, targets in metric_logger.log_every(data_loader_val, 256, header):
         samples = samples.to(device)
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
