@@ -30,6 +30,13 @@ from arguments import get_args_parser
 import argparse
 
 
+def traverse_dict(dct):
+    for key, value in dct.items():
+        if isinstance(value, dict):
+            traverse_dict(value)
+        if type(value) == torch.Tensor:
+                dct[key] = np.array(dct[k].cpu().detach()).tolist()
+
 def build_distil_model(args):
     """ build a teacher model """
     assert args.distil_model in ['vidt_nano', 'vidt_tiny', 'vidt_small', 'vidt_base']
@@ -176,9 +183,7 @@ def main(args):
 
         # inference
         outputs = model(samples)
-        for k in outputs.keys():
-            if type(outputs[k]) == torch.Tensor:
-                outputs[k] = np.array(outputs[k].cpu().detach()).tolist()
+        traverse_dict(outputs)
         with open('output.json', 'w') as f:
             json.dump(outputs, f)
         with open('input.json', 'w') as f:
