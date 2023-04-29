@@ -35,7 +35,7 @@ def traverse_dict(dct):
         if isinstance(value, dict):
             traverse_dict(value)
         if type(value) == torch.Tensor:
-                dct[key] = np.array(dct[k].cpu().detach()).tolist()
+                dct[key] = np.array(dct[key].cpu().detach()).tolist()
 
 def build_distil_model(args):
     """ build a teacher model """
