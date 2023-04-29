@@ -178,7 +178,7 @@ def main(args):
         outputs = model(samples)
         for k in outputs.keys():
             if type(outputs[k]) == torch.Tensor:
-                outputs[k] = np.array(outputs[k].cpu())
+                outputs[k] = np.array(outputs[k].cpu().detach())
         with open('output.json', 'w') as f:
             json.dump(outputs, f)
         with open('input.json', 'w') as f:
