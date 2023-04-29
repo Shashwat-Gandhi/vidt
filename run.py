@@ -176,7 +176,7 @@ def main(args):
 
         # inference
         outputs = model(samples)
-        for k in ouputs.keys():
+        for k in outputs.keys():
             if type(outputs[k]) == torch.Tensor:
                 outputs[k] = np.array(outputs[k])
         with open('output.json', 'w') as f:
