@@ -14,7 +14,9 @@ import torch
 import torch.nn.functional as F
 from torch.autograd import Function
 from torch.autograd.function import once_differentiable
-
+sys.path.append('vidt')     # for colab
+sys.path.append('/kaggle/working/vidt') # for kaggle
+sys.path.append('/kaggle/working')
 import MultiScaleDeformableAttention as MSDA
 
 
