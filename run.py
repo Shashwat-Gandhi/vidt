@@ -10,6 +10,8 @@ sys.path.append('vidt')     # for colab
 sys.path.append('/kaggle/working/vidt') # for kaggle
 sys.path.append('/kaggle/working')
 import os
+from IPython.display import Image
+import matplotlib.pyplot as plt
 import datetime
 import json
 import random
@@ -30,12 +32,6 @@ from arguments import get_args_parser
 import argparse
 
 
-def traverse_dict(dct):
-    for key, value in dct.items():
-        if isinstance(value, dict):
-            traverse_dict(value)
-        if type(value) == torch.Tensor:
-                dct[key] = np.array(dct[key].cpu().detach()).tolist()
 
 def build_distil_model(args):
     """ build a teacher model """
@@ -181,16 +177,8 @@ def main(args):
         samples = samples.to(device)
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
-        # inference
         outputs = model(samples)
-        traverse_dict(outputs)
-        with open('output.json', 'w') as f:
-            json.dump(outputs, f)
-        with open('input.json', 'w') as f:
-            json.dump(samples, f)
-        with open('target.json', 'w') as f:
-            json.dump(targets, f)
-        
+        print(outputs)
         break
     
 #     for epoch in range(args.start_epoch, args.epochs):
